@@ -1,7 +1,19 @@
 import numpy as np
-from tensorflow.examples.tutorials import mnist
+import tensorflow as tf
 import os
 import numpy as np
+
+def get_mnist():
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+    train = Dataset(x_train, y_train)
+    test = Dataset(x_test, y_test)
+    validation = Dataset(x_test, y_test)
+    data = {
+        'train':train,
+        'test':test,
+        'validation':validation
+    }
+    return data
 
 
 class Dataset(object):
@@ -58,8 +70,9 @@ class MnistDataset(object):
         data_directory = "MNIST"
         if not os.path.exists(data_directory):
             os.makedirs(data_directory)
-        dataset = mnist.input_data.read_data_sets(data_directory)
-        self.train = dataset.train
+        dataset = get_mnist()
+
+        self.train = dataset['train']
         # make sure that each type of digits have exactly 10 samples
         sup_images = []
         sup_labels = []
@@ -75,8 +88,8 @@ class MnistDataset(object):
             np.asarray(sup_images),
             np.asarray(sup_labels),
         )
-        self.test = dataset.test
-        self.validation = dataset.validation
+        self.test = dataset['test']
+        self.validation = dataset['validation']
         self.image_dim = 28 * 28
         self.image_shape = (28, 28, 1)
 
